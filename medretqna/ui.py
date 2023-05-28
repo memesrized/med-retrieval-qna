@@ -1,5 +1,4 @@
-import json
-from pathlib import Path
+import os
 
 import requests
 import streamlit as st
@@ -17,6 +16,8 @@ hide_menu_style = """
         </style>
         """
 st.markdown(hide_menu_style, unsafe_allow_html=True)
+
+MODEL_HOST = os.getenv("MODEL_HOST") or "localhost"
 
 # ui
 text_placeholder = (
@@ -47,7 +48,7 @@ with st.form("prof_form"):
     submit_button = st.form_submit_button("Ask")
 
 if submit_button:
-    url = "http://localhost:8000/query"
+    url = f"http://{MODEL_HOST}:8000/query"
     top_k = None if not top_k else top_k
     myobj = {
         "text": text,

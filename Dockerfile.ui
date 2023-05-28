@@ -1,0 +1,13 @@
+FROM python:3.8-slim
+
+RUN pip install --upgrade pip
+
+COPY ./medretqna/ui.py /ui.py
+
+RUN pip install --no-cache-dir streamlit==1.22.0
+
+EXPOSE 8501
+
+WORKDIR /
+
+CMD streamlit run /ui.py --browser.gatherUsageStats=false --server.headless=true --server.fileWatcherType=none
