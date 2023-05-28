@@ -5,6 +5,7 @@ from mrq.utils import EntityDecoder
 from transformers import AutoModel, AutoTokenizer, pipeline
 from transformers.modeling_outputs import BaseModelOutputWithPoolingAndCrossAttentions
 
+
 # TODO: add debug logger maybe
 class EmbedModel:
     def __init__(
@@ -20,7 +21,7 @@ class EmbedModel:
             mode (str, optional): _description_. Defaults to "token".
             device (str, optional): _description_. Defaults to "cpu".
         """
-        self._model = AutoModel.from_pretrained(model_name)
+        self._model = AutoModel.from_pretrained(model_name).to(device)
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
         self.device = device
         self.mode = mode
@@ -105,18 +106,25 @@ class NERModel:
         else:
             self._decoder = self._default_decoder
 
-    def __call__(self, text: str) -> List[dict]:
+    def __call__(
+        self, text: Union[str, List[str]]
+    ) -> Union[List[dict], List[List[dict]]]:
         """Ner prediction method
 
         Args:
-            text (str): input text
+            text (str): input text or list of texts
 
         Returns:
-            List[dict]: list of entities
+            List[dict]: list of entities or list of lists of entities
         """
-        return self._decoder(self._model(text))
+        model_result = self._model(text)
+        if isinstance(text, list):
+            decoded = [self._decoder(x) for x in model_result]
+        else:
+            decoded = self._decoder(model_result)
+        return decoded
 
-    def _default_decoder(self, ents: list) -> List[dict]:
+    def _default_decoder(self, ents: List[dict]) -> List[dict]:
         return [
             {
                 "tag": ent["entity_group"],
@@ -126,3 +134,33 @@ class NERModel:
             }
             for ent in ents
         ]
+
+class NERClassifier(NERModel):
+    """Classifier upon NER model"""
+
+    def __call__(self, text: Union[List[str], str]) -> List[bool]:
+        """Classify input text
+
+        Args:
+            text (Union[List[str], str]): input text or list of texts.
+
+        Returns:
+            List[bool]: classes (1 - medical relate, 0 - unrelated)
+        """
+        if isinstance(text, str):
+            text = [text]
+        res = super().__call__(text)
+        return list(map(bool, res))
+
+    def extract(self, text: Union[List[str], str]) -> List[str]:
+        """Classify and return only related records.
+
+        Args:
+            text (Union[List[str], str]): input text or list of texts.
+
+        Returns:
+            List[str]: list of related records.
+        """
+        if isinstance(text, str):
+            text = [text]
+        return [t for t, flag in zip(text, self(text)) if flag]
