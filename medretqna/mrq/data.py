@@ -66,7 +66,11 @@ class AnswerDB:
         return self.data[idx]
 
     def encode(
-        self, emb: EmbedModel, tqdm_flag: bool = False, batch_len: int = 1
+        self,
+        emb: EmbedModel,
+        tqdm_flag: bool = False,
+        batch_len: int = 1,
+        final_device="cpu",
     ) -> Self:
         """Encode texts with provided embeddings model
 
@@ -76,6 +80,7 @@ class AnswerDB:
             batch_len (int, optional): number of records to process at a time.
                 Larger number -> more memory consumption and less computation time.
                 Defaults to 1.
+            final_device (str, optional): where to store embeddings after processing
 
         Raises:
             ValueError: if batch_len is < 1
@@ -91,15 +96,18 @@ class AnswerDB:
             proxy = tqdm(batched, total=len(self.data) / batch_len)
         else:
             proxy = batched
-        self.embedded = torch.cat([emb(batch) for batch in proxy], dim=0)
+        self.embedded = torch.cat([emb(batch) for batch in proxy], dim=0).to(
+            final_device
+        )
         return self
 
 
 class Query:
-    def __init__(self, text: str):
+    def __init__(self, text: str, embedded: torch.tensor=None):
         """Wrapper class for text query"""
         self.text = text
+        self.embedded = embedded
 
-    def embed(self, emb: EmbedModel) -> Self:
-        self.embedded = emb(self.text)
+    def embed(self, emb: EmbedModel, final_device="cpu") -> Self:
+        self.embedded = emb(self.text).to(final_device)
         return self

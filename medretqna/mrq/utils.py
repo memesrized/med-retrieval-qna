@@ -1,6 +1,8 @@
+import re
 from typing import List
 
 from transformers import PreTrainedTokenizer
+
 
 # TODO: add debug logger maybe
 class EntityDecoder:
@@ -110,3 +112,12 @@ class EntityDecoder:
             }
             res.append(temp_ent)
         return res
+
+
+def fix_sentence(text):
+    text = re.sub("\s", " ", text).strip()
+    if not text.endswith("."):
+        text+="."
+    if not text[0].isupper():
+        text = text[0].upper() + text[1:]
+    return text

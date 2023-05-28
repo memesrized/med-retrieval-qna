@@ -9,17 +9,31 @@ log = get_logger(__name__)
 
 
 class GoldenRetriever:
-    def __init__(self, data: AnswerDB) -> None:
+    def __init__(self, data: AnswerDB, output_format: str = "numpy") -> None:
         """Retrieval algorithm for most related (golden) db answers to a query
 
         And a dog;)
 
         Args:
             data (AnswerDB): data to search in.
+            output_format (str): numpy or list as output
         """
         self.data = data
         if not hasattr(self.data, "embedded"):
             log.warning("Data for retrieval task doesn't have embeddings")
+        self.output = output_format
+
+    def _format_output(self, output):
+        if self.output == "numpy":
+            return output
+        elif self.output == "list":
+            return {
+                "answers": list(map(str, output["answers"])),
+                "similarities": list(map(float, output["similarities"])),
+                "indices": list(map(int, output["indices"])),
+            }
+        else:
+            raise ValueError("Unknown output format {}".format(self.output))
 
     def find_it(
         self, q: Query, top_k: int = None, sorted: bool = True
@@ -45,7 +59,10 @@ class GoldenRetriever:
             raise ValueError("top_k should be >=1")
         similarity = self.data.embedded @ q.embedded.T
         similarity = torch.topk(similarity.squeeze(-1).cpu(), k=top_k, sorted=sorted)
-        return {
-            "answers": self.data.data[similarity.indices],
-            "similarities": similarity.values.numpy(),
-        }
+        return self._format_output(
+            {
+                "answers": self.data[similarity.indices],
+                "similarities": similarity.values.numpy(),
+                "indices": similarity.indices.numpy(),
+            }
+        )
