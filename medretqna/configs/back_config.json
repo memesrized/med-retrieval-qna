@@ -1,0 +1,5 @@
+{
+    "ner_name": "ukkendane/bert-medical-ner",
+    "emb": "menadsa/S-BioELECTRA",
+    "db": "data/pickled_example.pkl"
+}
