@@ -1,5 +1,48 @@
 # Small system for Question Answering with Information Retrieval in Medical domain
 
+## How to run the app
+
+### Params to play with:
+
+
+1. `medretqna/configs/data_preparation_config.json`
+    - "sample_size_per_db": 10
+        - There are to datasets with n thousands of examples.
+        - Set some big numbers to set the pipeline
+        - But be aware that it's time consuming of CPU.
+    - "seed": 1337
+        - just random seed for reproducibility
+    - "batch_len": 5
+        - number of records to process at a time
+        - bigger number -> faster and more memory consuming
+    - "device": "system"
+        - cpu / cuda:0 (for gpu) / default "system" will check your system and cuda availability and set proper device
+    - "mode": "QA"
+        - which data to use from datasets
+        - A - answers, Q - questions, QA - concatenated
+2. `medretqna/configs/back_config.json`
+    - "ner_name": "ukkendane/bert-medical-ner"
+        - ner model
+    - "emb": "menadsa/S-BioELECTRA"
+        - name of embeddings model
+
+Models names you can find in `Models to play` section below.
+
+
+### Preparation:
+
+To run this app you need to create data (aka database with answers):
+1. `pip install -r requirements.txt` (in your venv)
+2. `cd medretqna`
+3. `python data_preparation.py`
+
+### Launch:
+
+In repository root:
+
+1. `docker-compose up --build`
+2. open `http://localhost:8501/` in your browser
+
 ## Task description
 
 There is a need to extract the most related to a question records from the knowledge base.
@@ -109,3 +152,71 @@ Let's take a text that is very related to some records in our database. If we ad
 #### Pretrained/custom models
 
 A lot of pretrained embeddings models are available in huggingface, but for better performance it's better to train (or finetune) a model with custom loss that is based on penalty for distance between human questions and answers.
+
+### LLM
+LLMs are good for general language understanding due to large amount of training data.
+
+At the same time they are really slow and expensive, so it's good baseline to test other models, but not production solution
+
+#### Pretrained/custom models
+
+It's more about proprietary API vs fine-tuned local model. In case of small amounts of requests proprietary API is much more memory efficient, but then we have problems with legal aspects of data transferring (GDPR, etc.)
+
+## Final architecture
+
+As data is not provided and given time is limited I decided to pick pretrained models and test data from huggingface.
+
+### Data
+
+After my investigation I found these datasets to be the closest to given task open data.
+
+Possible QnA database:
+
+- `medmcqa`
+    - QnA dataset with multiple answers
+- `medquad` (`AnonymousSub/MedQuAD_47441_Question_Answer_Pairs` on huggingface)
+    - QnA dataset
+
+Interesting test set (is not implemented yet):
+
+- `Elfsong/ClinicalDataset`
+    - patient-doctor small dialogs and their summaries
+
+### Models and Pipeline
+
+The best solution that is possible to implement without model training (with usage of pretrained models) is NER as classification + sentence embeddings.
+
+There are a lot of general med/bio/clinical models for ner and embeddings, but classification task is too specific to find open-source solution.
+
+LLMs are too big for local experiments and also small LLMs are not that good.
+
+Just embeddings without ner should suffer from irrelevant information without proper fine-tuning. Such tuning can be done but it's time consuming and take a lot of effort.
+
+#### Models to play with
+
+    ner_models = [
+        "ukkendane/bert-medical-ner",
+        "samrawal/bert-base-uncased_clinical-ner",
+        "samrawal/bert-large-uncased_med-ner",
+    ]
+    emb_models = [
+        "emilyalsentzer/Bio_ClinicalBERT",
+        "medicalai/ClinicalBERT",
+        "pritamdeka/S-Biomed-Roberta-snli-multinli-stsb",
+        "menadsa/S-BioELECTRA",
+        "TimKond/S-BioLinkBert-MedQuAD",
+        "TimKond/S-PubMedBert-MedQuAD",
+        "kamalkraj/bioelectra-base-discriminator-pubmed",
+    ]
+
+### Retrieval Algorithm
+
+To imitate embeddings search simple matrix multiplication is used to find similarities and then pick sorted top-k results.
+
+In production (e.g. `n` millions of records) it can be implemented via `elastic search` or `faiss` library.
+
+### Backend and UI
+
+Simple `FastAPI` server with hosted models and `Streamlit` for demonstration with nice UI.
+
+Also it's possible to up the whole app with `docker-compose`.
