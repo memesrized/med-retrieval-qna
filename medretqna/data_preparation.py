@@ -4,9 +4,8 @@ import pickle
 import torch
 from mrq import PROJECT_PATHS
 from mrq.data import AnswerDB, load_data
-from mrq.models import EmbedModel
-
 from mrq.logger import get_logger
+from mrq.models import EmbedModel
 
 if __name__ == "__main__":
     log = get_logger(__name__)
@@ -36,7 +35,7 @@ if __name__ == "__main__":
     ansdb = AnswerDB(list(set(data["A"]))).encode(
         emb_model, tqdm_flag=True, batch_len=prep_config["batch_len"]
     )
-    
+
     log.info("Ans embedded shape: {}".format(ansdb.embedded.shape))
 
     # saving data

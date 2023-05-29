@@ -55,9 +55,9 @@ class Paraphraser:
         """
         text = "paraphrase: " + text + " </s>"
         outputs = self.model.generate(
-            **self.tokenizer(
-                text, return_tensors="pt", truncation=True, padding=True
-            ).to(self.device),
+            **self.tokenizer(text, return_tensors="pt", truncation=True, padding=True).to(
+                self.device
+            ),
             max_length=256,
             do_sample=True,
             top_k=120,

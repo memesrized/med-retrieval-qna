@@ -25,9 +25,10 @@ Possible problems: unclear structure, non-related information, reply time
 ### Named Entity Recognition based
 
 It can be done for general questions, but then it requires too much time, data and resources.
-For simplicity let's define the task as "Can I use this medicine in this certain condition?" 
 
-With this assumption most cases can be defined as a set of entities: 
+For simplicity let's define the task as "Can I use this medicine in this certain condition?"
+
+With this assumption most cases can be defined as a set of entities:
 - person condition
     - use of medicine
     - chronic illness
@@ -40,16 +41,16 @@ NER may help with solving of unclear structure and unrelated information as it's
 
 #### Variations
 1. Naive
-    
-    In naive approach is simple matching of entities between input and Q&A (already processed by the model) database can be used.  
-    
+
+    In naive approach is simple matching of entities between input and Q&A (already processed by the model) database can be used.
+
     If should be fast, but a lot of information will be lost due to different forms of words.
 
 2. Naive + static embeddings + ranking by distance
-    
+
     The same approach but with static embeddings (Word2Vec, fastText, etc.) applied to entities from both sides.
 
-    Embeddings for a text (entities) is just a mean of their vectors.  
+    Embeddings for a text (entities) is just a mean of their vectors.
 
     Also similarity of texts is cosine or euclid distance between vectors, so they can be sorted (ranked) by this distance.
 
@@ -57,9 +58,9 @@ NER may help with solving of unclear structure and unrelated information as it's
 
     Same, but with context embeddings for entities.
 
-4. NER as classifier + static embeddings + ranking by distance  
+4. NER as classifier + static embeddings + ranking by distance
 
-    NER extracts only related words that it was trained for, but what if information in other words is somewhat related to the situation?  
+    NER extracts only related words that it was trained for, but what if information in other words is somewhat related to the situation?
 
     Input is a sequence of texts, let's say that an element of the sequence is related to the question if there is at least on entity found by NER model.
 

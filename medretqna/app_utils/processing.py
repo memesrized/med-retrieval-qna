@@ -10,13 +10,10 @@ def output_postprocessing(
     # TODO: make it a set?
     ind_to_retain = list(range(len(output["answers"])))
     if threshold:
-        ind_to_retain = [
-            i for i, x in enumerate(output["similarities"]) if x > threshold
-        ]
+        ind_to_retain = [i for i, x in enumerate(output["similarities"]) if x > threshold]
 
     cut_output = {
-        k: [el for i, el in enumerate(v) if i in ind_to_retain]
-        for k, v in output.items()
+        k: [el for i, el in enumerate(v) if i in ind_to_retain] for k, v in output.items()
     }
 
     return {

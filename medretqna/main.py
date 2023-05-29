@@ -1,14 +1,12 @@
 import json
 
-from fastapi import FastAPI
-from segtok.segmenter import split_single
-
-from mrq.data import Query
-
-from mrq.logger import get_logger
 from app_utils.load import load_on_startup
-from app_utils.schemes import UserQuery
 from app_utils.processing import output_postprocessing
+from app_utils.schemes import UserQuery
+from fastapi import FastAPI
+from mrq.data import Query
+from mrq.logger import get_logger
+from segtok.segmenter import split_single
 
 with open("configs/back_config.json") as file:
     config = json.load(file)
@@ -31,6 +29,4 @@ async def query_base(q: UserQuery):
     query = Query(text).embed(emb)
     res = retriever.find_it(query, top_k=q.topk)
     log.debug("res: {}".format(res))
-    return output_postprocessing(
-        res, ner_predictions=ner_entities, threshold=q.threshold
-    )
+    return output_postprocessing(res, ner_predictions=ner_entities, threshold=q.threshold)

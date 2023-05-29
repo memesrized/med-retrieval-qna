@@ -36,7 +36,7 @@ class GoldenRetriever:
             raise ValueError("Unknown output format {}".format(self.output))
 
     def find_it(
-        self, q: Query, top_k: int = None, sorted: bool = True
+        self, q: Query, top_k: int = None, sorted_: bool = True
     ) -> Dict[str, np.array]:
         """Search for most related answers
 
@@ -58,7 +58,7 @@ class GoldenRetriever:
         if top_k < 1:
             raise ValueError("top_k should be >=1")
         similarity = self.data.embedded @ q.embedded.T
-        similarity = torch.topk(similarity.squeeze(-1).cpu(), k=top_k, sorted=sorted)
+        similarity = torch.topk(similarity.squeeze(-1).cpu(), k=top_k, sorted=sorted_)
         return self._format_output(
             {
                 "answers": self.data[similarity.indices],

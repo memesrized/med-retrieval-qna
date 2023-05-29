@@ -8,9 +8,7 @@ from transformers.modeling_outputs import BaseModelOutputWithPoolingAndCrossAtte
 
 # TODO: add debug logger maybe
 class EmbedModel:
-    def __init__(
-        self, model_name: str, mode: str = "token", device: str = "cpu"
-    ) -> None:
+    def __init__(self, model_name: str, mode: str = "token", device: str = "cpu") -> None:
         """Wrapper for embeddings model to make them sentence-wise.
 
         Ensures to provide normalized embeddings for cosine similarity
@@ -81,9 +79,7 @@ class EmbedModel:
 
 
 class NERModel:
-    def __init__(
-        self, model_name: str, agg: str = "first", device: str = "cpu"
-    ) -> None:
+    def __init__(self, model_name: str, agg: str = "first", device: str = "cpu") -> None:
         """Wrapped for huggingface NER pipeline
 
         This wrapper is needed to fix some models issues.
@@ -108,9 +104,7 @@ class NERModel:
 
         self.tags_to_filer = {"person", "pronoun"}
 
-    def __call__(
-        self, text: Union[str, List[str]]
-    ) -> Union[List[dict], List[List[dict]]]:
+    def __call__(self, text: Union[str, List[str]]) -> Union[List[dict], List[List[dict]]]:
         """Ner prediction method
 
         Args:
@@ -136,9 +130,9 @@ class NERModel:
             }
             for ent in ents
         ]
-    
+
     def _filter(self, ents):
-        return [x for x in ents if x['tag'] not in self.tags_to_filer]
+        return [x for x in ents if x["tag"] not in self.tags_to_filer]
 
 
 class NERClassifier(NERModel):
