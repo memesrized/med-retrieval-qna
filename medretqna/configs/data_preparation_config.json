@@ -1,5 +1,5 @@
 {
-    "sample_size": 10,
+    "sample_size_per_db": 10,
     "seed": 1337,
     "batch_len": 5,
     "device": "system"
