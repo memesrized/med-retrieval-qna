@@ -2,5 +2,6 @@
     "sample_size_per_db": 10,
     "seed": 1337,
     "batch_len": 5,
-    "device": "system"
+    "device": "system",
+    "mode": "Q"
 }

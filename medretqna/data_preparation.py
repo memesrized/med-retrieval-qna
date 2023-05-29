@@ -26,7 +26,11 @@ if __name__ == "__main__":
         seed=prep_config["seed"],
     )
     data = data.append(data1)
-    data = list(set(data["A"]))
+    if prep_config["mode"] == "QA":
+        data = data.drop_duplicates()
+        data = list(data["Q"] + "\n" + data["A"])
+    else:
+        data = list(set(data[prep_config["mode"]]))
 
     log.info("Final combined data length: {}".format(len(data)))
 
