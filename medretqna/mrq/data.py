@@ -1,14 +1,13 @@
 from typing import List
-from typing_extensions import Self
 
 import numpy as np
 import pandas as pd
 import torch
 from datasets import load_dataset
+from mrq.logger import get_logger
 from mrq.models import EmbedModel
 from tqdm.auto import tqdm
-
-from mrq.logger import get_logger
+from typing_extensions import Self
 
 log = get_logger(__name__)
 
@@ -96,14 +95,12 @@ class AnswerDB:
             proxy = tqdm(batched, total=len(self.data) / batch_len)
         else:
             proxy = batched
-        self.embedded = torch.cat([emb(batch) for batch in proxy], dim=0).to(
-            final_device
-        )
+        self.embedded = torch.cat([emb(batch) for batch in proxy], dim=0).to(final_device)
         return self
 
 
 class Query:
-    def __init__(self, text: str, embedded: torch.tensor=None):
+    def __init__(self, text: str, embedded: torch.tensor = None):
         """Wrapper class for text query"""
         self.text = text
         self.embedded = embedded

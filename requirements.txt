@@ -16,3 +16,4 @@ matplotlib==3.7.1
 # dev
 tqdm==4.64.1
 jupyter
+pre-commit==3.3.2

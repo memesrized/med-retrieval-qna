@@ -1,0 +1,18 @@
+[flake8]
+ignore =
+    # E203 Whitespace before ':' (E203) - handled by black
+    E203,
+    # W503 Line break occurred before a binary operator
+    W503
+
+
+max-line-length = 92
+max-doc-length = 92
+
+# flake8-quotes
+inline-quotes = double
+
+# flake8-unused-arguments
+unused-arguments-ignore-abstract-functions = True
+unused-arguments-ignore-stub-functions = True
+unused-arguments-ignore-variadic-names = True

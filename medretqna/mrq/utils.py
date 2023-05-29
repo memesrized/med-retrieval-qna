@@ -104,9 +104,7 @@ class EntityDecoder:
         for ent in grouped_ents:
             temp_ent = {
                 "tag": ent[0][self.entity_key].split(self.tag_sep, maxsplit=1)[1],
-                "text": self.tokenizer.convert_tokens_to_string(
-                    [x["word"] for x in ent]
-                ),
+                "text": self.tokenizer.convert_tokens_to_string([x["word"] for x in ent]),
                 "start": ent[0]["start"],
                 "end": ent[-1]["end"],
             }
@@ -115,9 +113,9 @@ class EntityDecoder:
 
 
 def fix_sentence(text):
-    text = re.sub("\s", " ", text).strip()
+    text = re.sub(r"\s", " ", text).strip()
     if not text.endswith("."):
-        text+="."
+        text += "."
     if not text[0].isupper():
         text = text[0].upper() + text[1:]
     return text

@@ -1,0 +1,35 @@
+name: Code quality check
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip3 install flake8==3.8.3 black==22.3.0 isort==5.12.0 --quiet
+
+    - name: Flake8
+      run: |
+        flake8 --max-line-length=92 --ignore=E203,W503 .
+
+    - name: Black
+      run: |
+        black --check -l 92 --diff .
+
+    - name: Isort
+      run: |
+        isort . --check-only --profile black --line-length=92

@@ -1,8 +1,8 @@
 import pickle
 
 from mrq.algs import GoldenRetriever
-from mrq.models import EmbedModel, NERClassifier
 from mrq.logger import get_logger
+from mrq.models import EmbedModel, NERClassifier
 
 log = get_logger(__name__)
 
