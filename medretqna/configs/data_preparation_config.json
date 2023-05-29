@@ -1,0 +1,6 @@
+{
+    "sample_size": 10,
+    "seed": 1337,
+    "batch_len": 5,
+    "device": "system"
+}

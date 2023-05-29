@@ -106,6 +106,8 @@ class NERModel:
         else:
             self._decoder = self._default_decoder
 
+        self.tags_to_filer = {"person", "pronoun"}
+
     def __call__(
         self, text: Union[str, List[str]]
     ) -> Union[List[dict], List[List[dict]]]:
@@ -119,9 +121,9 @@ class NERModel:
         """
         model_result = self._model(text)
         if isinstance(text, list):
-            decoded = [self._decoder(x) for x in model_result]
+            decoded = [self._filter(self._decoder(x)) for x in model_result]
         else:
-            decoded = self._decoder(model_result)
+            decoded = self._filter(self._decoder(model_result))
         return decoded
 
     def _default_decoder(self, ents: List[dict]) -> List[dict]:
@@ -134,6 +136,10 @@ class NERModel:
             }
             for ent in ents
         ]
+    
+    def _filter(self, ents):
+        return [x for x in ents if x['tag'] not in self.tags_to_filer]
+
 
 class NERClassifier(NERModel):
     """Classifier upon NER model"""
@@ -164,3 +170,17 @@ class NERClassifier(NERModel):
         if isinstance(text, str):
             text = [text]
         return [t for t, flag in zip(text, self(text)) if flag]
+
+    def ner(self, text: Union[List[str], str]) -> List[bool]:
+        """Classify input text
+
+        Args:
+            text (Union[List[str], str]): input text or list of texts.
+
+        Returns:
+            List[bool]: classes (1 - medical relate, 0 - unrelated)
+        """
+        if isinstance(text, str):
+            text = [text]
+        res = super().__call__(text)
+        return res
